@@ -1,0 +1,20 @@
+FROM golang:1.25-alpine AS build
+
+WORKDIR /app
+ COPY app/ .
+
+ RUN go mod download
+RUN go build -o app .
+RUN chmod +x ./app
+
+# Final stage
+FROM alpine:latest
+WORKDIR /app
+
+COPY --from=build /app .
+COPY samples ./samples
+#^ optional, you can use the "-v" command to run it without copying the samples
+
+RUN chmod +x ./app
+
+ENTRYPOINT ["./app"]
